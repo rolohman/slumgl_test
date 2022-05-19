@@ -2,6 +2,8 @@ good=[1 8 21 50 60 62 65 70];
 near=[9 12 27 28 30 35 44 61 74];
 
 
+
+
 dates=load('dates.txt');
 dst=num2str(dates);
 dn=datenum(dst,'yyyymmdd');
@@ -19,3 +21,4 @@ dt=dn(p2)-dn(p1);
 
 dt(good)
 dt(near)
+
