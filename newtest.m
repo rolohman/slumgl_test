@@ -27,7 +27,7 @@ Gvel=diag(dt);
 
 
 skip=[3 5];
-skip=[];
+%skip=[];
 good=setdiff(1:ni,skip);
 
 Gdef=Gdef(good,:);
@@ -63,40 +63,34 @@ for i=1:length(id)
     Gvela(end,goodi)=-1/goodcount;
 end
 
-Gvelb=Gvel;
+Gaug=zeros(length(id),ni);
 for i=1:length(id)
-    Gvelb(end+1,id(i))=1;
-    Gvelb(end,goodi)=-gooddt;
+    Gaug(i,id(i))=1;
+    Gaug(i,goodi)=-gooddt;
 end
+Gvelb=[Gvel;Gaug];
 
 Gga=inv(Gvela'*Gvela)*Gvel';
 Ggb=inv(Gvelb'*Gvelb)*Gvel';
 
 
-covi=Var*Gdef*Gdef';
+covi=2*Var*Gvela'*Gvela;
 W=inv(covi);
-G1=gooddt;
-Ggc=inv(G1'*W*G1)*G1'*W;
-avgr=Ggc*ints(goodi,:);
 
+
+Ggc=inv(Gvela'*W*Gvela)*Gvela'*W;
 % 
-
-
-
 
 moda   = Gga*ints;
 modb   = Ggb*ints;
-modc   = Ggc*ints;
 modsvd = Ggsvd*ints;
 
 
 meanmoda=mean(moda,2);
 meanmodb=mean(modb,2);
-meanmodc=mean(modc,2);
 meanmodsvd=mean(modsvd,2);
 stdmoda=std(moda,[],2);
 stdmodb=std(modb,[],2);
-stdmodc=std(modc,[],2);
 stdmodsvd=std(modsvd,[],2);
 
 dns=[dn(1:end-1) dn(2:end)]';
@@ -111,15 +105,13 @@ plot(dns(:,skip),(meanmoda(skip)-stdmoda(skip))*[1 1],'r')
 plot(dns,[meanmodb meanmodb]','g-');
 plot(dns(:,skip),(meanmodb(skip)+stdmodb(skip))*[1 1],'g')
 plot(dns(:,skip),(meanmodb(skip)-stdmodb(skip))*[1 1],'g')
-plot(dns,[meanmodc meanmodc]','c-');
-plot(dns(:,skip),(meanmodc(skip)+stdmodc(skip))*[1 1],'c')
-plot(dns(:,skip),(meanmodc(skip)-stdmodc(skip))*[1 1],'c')
+
 plot(dns,[meanmodsvd meanmodsvd]','b-')
 %plot(dns,meanmodsvd+stdmodsvd,'b:')
 %plot(dns,meanmodsvd-stdmodsvd,'b:')
 
 
 
-disp(['means: ' num2str(mean(moda(skip(1),:))) ' ' num2str(mean(modb(skip(1),:))) ' ' num2str(mean(modc(skip(1),:)))])
-disp(['stds: ' num2str(std(moda(skip(1),:))) ' ' num2str(std(modb(skip(1),:))) ' ' num2str(std(modc(skip(1),:)))])
+disp(['means: ' num2str(mean(moda(skip(1),:))) ' ' num2str(mean(modb(skip(1),:)))])
+disp(['stds: ' num2str(std(moda(skip(1),:))) ' ' num2str(std(modb(skip(1),:)))])
 
